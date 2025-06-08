@@ -125,7 +125,7 @@ class ForecastWeatherView(APIView):
         validated = serializer.validated_data
 
         override, _ = ForecastOverride.objects.update_or_create(
-            city=validated["city"],
+            city=validated["city"].capitalize(),
             date=validated["date"],
             defaults={
                 "min_temperature": validated["min_temperature"],
