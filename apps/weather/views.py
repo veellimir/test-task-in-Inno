@@ -16,10 +16,6 @@ from .services import get_current_weather, get_forecast_weather
 
 
 class CurrentWeatherView(APIView):
-    """
-    Получить список
-    """
-
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -33,18 +29,25 @@ class CurrentWeatherView(APIView):
         responses={200: openapi.Response(description="Успешный ответ с погодой")},
     )
     def get(self, request: Request) -> Response:
+        """
+        Получить температуру и время для указанного города.
+
+        Параметры запроса:
+        - `Сity`: str.
+
+        Возвращает:
+        - temperature
+        - local_time
+        """
         serializer = CurrentWeatherQuerySerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         city = serializer.validated_data["city"]
+
         data = get_current_weather(city)
         return Response(data)
 
 
 class ForecastWeatherView(APIView):
-    """
-    Получить список
-    """
-
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -64,6 +67,17 @@ class ForecastWeatherView(APIView):
         ]
     )
     def get(self, request: Request) -> Response:
+        """
+        Получить мин./макс. температуру и время, для указанного города.
+
+        Параметры запроса:
+        - `Сity`: str.
+        - `Date`: str.
+
+        Возвращает:
+        - min_temperature
+        - max_temperature
+        """
         serializer = ForecastQuerySerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
         city = serializer.validated_data["city"]
@@ -82,8 +96,28 @@ class ForecastWeatherView(APIView):
         return Response(data)
 
     @swagger_auto_schema(
+        operation_summary="Добавить или обновить прогноз погоды",
+        operation_description=(
+            "Создаёт или обновляет переопределённые данные прогноза температуры "
+            "для указанного города и даты."
+        ),
         request_body=ForecastOverrideSerializer,
-        responses={201: ForecastOverrideSerializer},
+        responses={
+            201: openapi.Response(
+                description="Успешно создано или обновлено",
+                schema=ForecastOverrideSerializer
+            ),
+            400: "Неверные данные запроса",
+            500: "Внутренняя ошибка сервера"
+        },
+        examples=[
+            {
+                "city": "Moscow",
+                "date": "08.06.2025",
+                "min_temperature": 15,
+                "max_temperature": 25
+            }
+        ],
     )
     def post(self, request: Request) -> Response:
         serializer = ForecastOverrideSerializer(data=request.data)

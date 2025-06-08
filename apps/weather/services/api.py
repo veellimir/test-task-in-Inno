@@ -21,7 +21,7 @@ def get_current_weather(city: str) -> Dict[str, str] | float:
         )
         data = response.json()
         if response.status_code != 200:
-            raise APIException(data.get("message", "City not found"))
+            raise APIException("Город не найден")
 
         result: Dict[str, str | float] = {
             "temperature": data["main"]["temp"],
@@ -47,7 +47,7 @@ def get_forecast_weather(city: str, date: str) -> Dict[str, float]:
         )
         data = response.json()
         if response.status_code != 200:
-            raise APIException(data.get("message", "City not found"))
+            raise APIException("Город не найден")
 
         target = datetime.strptime(date, "%d.%m.%Y").date()
         temps = [
@@ -57,7 +57,7 @@ def get_forecast_weather(city: str, date: str) -> Dict[str, float]:
         ]
 
         if not temps:
-            raise APIException("No forecast data available for this date")
+            raise APIException("Данные на эту дату отсутствуют")
 
         result: Dict[str, float] = {
             "min_temperature": min(temps),
