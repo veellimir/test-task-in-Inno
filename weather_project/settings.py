@@ -1,12 +1,21 @@
 from pathlib import Path
+from typing import Final
 
 from .env_config import *
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = ENV__SECRET_KEY
-DEBUG = ENV__DEBUG
-ALLOWED_HOSTS = [ENV__ALLOWED_HOSTS]
+SECRET_KEY: str = ENV__SECRET_KEY
+DEBUG: bool = ENV__DEBUG
+ALLOWED_HOSTS: list[str] = [ENV__ALLOWED_HOSTS]
+
+
+class SuffixRouter:
+    SUFFIX_API: Final[str] = "api/weather/"
+
+    CURRENT: Final[str] = f"{SUFFIX_API}current"
+    FORCAST: Final[str] = f"{SUFFIX_API}forecast"
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -18,6 +27,8 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "drf_yasg",
+
+    "apps.weather.apps.WeatherConfig",
 ]
 
 MIDDLEWARE = [
@@ -49,14 +60,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "weather_project.wsgi.application"
 
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -73,13 +82,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = "ru-RU"
 TIME_ZONE = "Europe/Samara"
 
 USE_I18N = True
 USE_TZ = True
-
 
 STATIC_URL = "static/"
 
